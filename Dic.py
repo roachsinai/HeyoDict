@@ -111,7 +111,7 @@ def parseContent(content):
 def showResult(jsondata):
 	#First extract useful fields
 	words = jsondata['query']
-	phonetic = jsondata['basic']['us-phonetic']
+	phonetic = jsondata['basic'].get('us-phonetic','')
 	explains = jsondata['basic']['explains']
 	web_explains = jsondata['web']
 
