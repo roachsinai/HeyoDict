@@ -23,6 +23,16 @@ queryWord = ""
 # dic or translate
 only = "" 
 
+core_command_quit = "exit"
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+
 def main(argv):
 	if len(argv) == 1:
 		queryword = argv[0]
@@ -64,7 +74,13 @@ def sendRequest(keyword, selection):
 
 	# build url and send request
 	requestUrl = url % urllib.urlencode(param)
-	content = urllib2.urlopen(requestUrl).read()
+	# print requestUrl
+	try:
+		content = urllib2.urlopen(requestUrl).read()
+	except:
+		print bcolors.WARNING + "Network Error"+bcolors.ENDC
+		return -1
+
 	parseContent(content)
 
 def parseContent(content):
@@ -93,8 +109,32 @@ def parseContent(content):
 	#finish
 
 def showResult(jsondata):
-	#First
+	#First extract useful fields
+	words = jsondata['query']
+	phonetic = jsondata['basic']['us-phonetic']
+	explains = jsondata['basic']['explains']
+	web_explains = jsondata['web']
+
+	#Then show word and its phonetic
+	basic_meaning = words + bcolors.HEADER + " [" + phonetic + "]" + bcolors.ENDC 
+
+	#Then show the explainations from dict
+	print '======== ' + basic_meaning + ' ========'
+	for ex in explains:
+		print ' ' + bcolors.OKGREEN + ex + bcolors.ENDC + ' '
+	print '======== ' + 'more ref' + ' ========'
+	for web in web_explains:
+		print '------ ' + web['key'] + ' ------'
+		for exp in web['value']:
+			print ' ' + bcolors.OKBLUE + exp + bcolors.ENDC + ' '
 
 
 if __name__ == "__main__":
-	main(sys.argv[1:])
+	raw = ""
+	while True:
+		raw = raw_input('=> ')
+		if raw == core_command_quit:
+			break;
+		else:
+			main(['-d',raw])
+
