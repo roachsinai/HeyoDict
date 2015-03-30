@@ -21,9 +21,9 @@ docType = "json"
 version = "1.1"
 queryWord = ""
 # dic or translate
-only = "" 
+only = ""
 
-core_command_quit = "exit"
+core_command_quit = ".exit"
 
 class bcolors:
     HEADER = '\033[95m'
@@ -53,7 +53,7 @@ def main(argv):
 
 
 def printUsage():
-	print "Dic.py -d or -t word" 
+	print "Dic.py -d or -t word"
 
 def sendRequest(keyword, selection):
 	# build parameters
@@ -116,7 +116,7 @@ def showResult(jsondata):
 	web_explains = jsondata['web']
 
 	#Then show word and its phonetic
-	basic_meaning = words + bcolors.HEADER + " [" + phonetic + "]" + bcolors.ENDC 
+	basic_meaning = words + bcolors.HEADER + " [" + phonetic + "]" + bcolors.ENDC
 
 	#Then show the explainations from dict
 	print '======== ' + basic_meaning + ' ========'
@@ -137,4 +137,3 @@ if __name__ == "__main__":
 			break;
 		else:
 			main(['-d',raw])
-
