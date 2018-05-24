@@ -37,7 +37,9 @@ class bcolors:
 more_ref = False
 
 def printUsage():
-        print("Dic.py -d or -t word")
+        print("dict -d word")
+        print("dict -t word")
+        print("dict word -")
 
 def sendRequest(keyword, selection):
         # build parameters
@@ -95,9 +97,13 @@ def parseContent(content):
 def showResult(jsondata):
         #First extract useful fields
         words = jsondata['query']
-        phonetic = jsondata['basic'].get('us-phonetic','')
+        if 'basic' not in jsondata:
+            # print(' '.join(['Oops,', str(sys.argv), 'was eaten by a monster!']))
+            print('Oops, a special word!')
+            print(bcolors.WARNING+ 'lɪtl bɪtʃ!' + bcolors.ENDC)
+            return
+        phonetic = jsondata['basic'].get('uk-phonetic','')
         explains = jsondata['basic']['explains']
-        web_explains = jsondata['web']
 
         #Then show word and its phonetic
         basic_meaning = words + bcolors.HEADER + " [" + phonetic + "]" + bcolors.ENDC
@@ -107,6 +113,11 @@ def showResult(jsondata):
         for ex in explains:
                 print(' ' + bcolors.OKGREEN + ex + bcolors.ENDC + ' ')
         if more_ref:
+            if 'web' not in jsondata:
+                print("\nDear Miss %s," % words)
+                print(bcolors.OKBLUE + "    There is no more thing in my pockets!" + bcolors.ENDC)
+                return
+            web_explains = jsondata['web']
             print('======== ' + 'more ref' + ' ========')
             for web in web_explains:
                     print('------ ' + web['key'] + ' ------')
