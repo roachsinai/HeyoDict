@@ -40,11 +40,12 @@ def printUsage():
         print("dict -d word")
         print("dict -t word")
         print("dict word -")
+        print("dict words")
 
 def sendRequest(keyword, selection):
         # build parameters
         if keyword is None or not keyword:
-                return -1
+            return -1
 
         param = {}
         param.update({'keyfrom' : keyFrom})
@@ -54,7 +55,7 @@ def sendRequest(keyword, selection):
         param.update({'version': version})
 
         if selection is not None:
-                param.update({'only': selection})
+            param.update({'only': selection})
 
         param.update({'q': keyword})
 
@@ -62,25 +63,25 @@ def sendRequest(keyword, selection):
         requestUrl = url % urllib.parse.urlencode(param)
         # print requestUrl
         try:
-                content = urllib.request.urlopen(requestUrl).read()
+            content = urllib.request.urlopen(requestUrl).read()
         except:
-                print(bcolors.WARNING + "Network Error"+bcolors.ENDC)
-                return -1
+            print(bcolors.WARNING + "Network Error"+bcolors.ENDC)
+            return -1
 
         parseContent(content)
 
 def parseContent(content):
         try:
-                jsonData = json.loads(content)
+            jsonData = json.loads(content)
         except ValueError:
-                print("Invalid Json Content")
-                return -1
+            print("Invalid Json Content")
+            return -1
 
         # handle error code
         errorCode = jsonData['errorCode']
         if errorCode == 0:
-                # successful
-                showResult(jsonData)
+            # successful
+            showResult(jsonData)
         elif errorCode == 20:
                 print("Too many words")
         elif errorCode == 30:
@@ -120,29 +121,29 @@ def showResult(jsondata):
             web_explains = jsondata['web']
             print('======== ' + 'more ref' + ' ========')
             for web in web_explains:
-                    print('------ ' + web['key'] + ' ------')
-                    for exp in web['value']:
-                            print(' ' + bcolors.OKBLUE + exp + bcolors.ENDC + ' ')
+                print('------ ' + web['key'] + ' ------')
+                for exp in web['value']:
+                    print(' ' + bcolors.OKBLUE + exp + bcolors.ENDC + ' ')
 
 
 if __name__ == "__main__":
-        if len(sys.argv) == 2:
-                queryword = sys.argv[1]
-                sendRequest(queryword, None)
+        if len(sys.argv) == 1:
+            printUsage()
         elif len(sys.argv) == 3:
-                if sys.argv[1] == "-d":
-                        only = "dict"
-                        queryword = sys.argv[2]
-                        sendRequest(queryword, only)
-                elif sys.argv[1] == "-t":
-                        only = "tanslate"
-                        queryword = sys.argv[2]
-                        sendRequest(queryword, only)
-                elif sys.argv[2] == "-":
-                    queryword = sys.argv[1]
-                    more_ref = True
-                    sendRequest(queryword, only)
-                else:
-                        printUsage()
-        else:
+            if sys.argv[1] == "-d":
+                only = "dict"
+                queryword = sys.argv[2]
+                sendRequest(queryword, only)
+            elif sys.argv[1] == "-t":
+                only = "tanslate"
+                queryword = sys.argv[2]
+                sendRequest(queryword, only)
+            elif sys.argv[2] == "-":
+                queryword = sys.argv[1]
+                more_ref = True
+                sendRequest(queryword, only)
+            else:
                 printUsage()
+        else:
+            queryword = " ".join(sys.argv[1:])
+            sendRequest(queryword, None)
