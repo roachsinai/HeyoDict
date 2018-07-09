@@ -1,8 +1,11 @@
 #! /usr/bin/python
 #! -*- coding: utf-8 -*-
+import os
 import sys
 import urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error, urllib.parse
+from urllib.error import URLError, HTTPError
 import json
+import subprocess
 
 """
 Reversion HeyooDic
@@ -11,6 +14,10 @@ Transfer from unoffical API to offical API
 Chrisplus
 2014-6
 """
+
+HOME = os.path.expanduser("~")
+BASE_DIR = os.path.join(HOME, '.dict_youdao')   # 用户数据根目录
+VOICE_DIR = os.path.join(BASE_DIR, 'voice')     # 音频文件
 
 # Key and name
 url = "http://fanyi.youdao.com/openapi.do?%s"
@@ -37,10 +44,12 @@ class bcolors:
 more_ref = False
 
 def printUsage():
-        print("dict -d word")
-        print("dict -t word")
-        print("dict word -")
-        print("dict words")
+        print("dict -d word[s]")
+        print("dict -t word[s]")
+        print("dict -v word[s]")
+        print("dict -r word[s]")
+        print("dict -m word[s]")
+        print("dict word[s]")
 
 def sendRequest(keyword, selection):
         # build parameters
@@ -102,7 +111,7 @@ def showResult(jsondata):
             # print(' '.join(['Oops,', str(sys.argv), 'was eaten by a monster!']))
             print('Oops, a special word!')
             print(bcolors.WARNING+ 'lɪtl bɪtʃ!' + bcolors.ENDC)
-            return
+            sys.exit() # not use return, for download pronunciation
         phonetic = jsondata['basic'].get('uk-phonetic','')
         explains = jsondata['basic']['explains']
 
@@ -125,25 +134,47 @@ def showResult(jsondata):
                 for exp in web['value']:
                     print(' ' + bcolors.OKBLUE + exp + bcolors.ENDC + ' ')
 
+def playVoice(queryword, isReplay):
+    voice_file = os.path.join(VOICE_DIR, 'pronunciation.mp3')
+    if not isReplay:
+        audioUrl = 'http://dict.youdao.com/dictvoice?audio=%s' % queryword
+        try:
+            r = urllib.request.urlopen(audioUrl)
+        except HTTPError as e:
+            print('Error code: ', e.code)
+            print('Replay the pronunciation of lasted query word!')
+        except URLError as e:
+            print('Reason: ', e.reason)
+            print('Replay the pronunciation of lasted query word!')
+        else:
+            with open(voice_file, 'wb') as f:
+                f.write(r.read())
+    subprocess.call(['play', voice_file], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
 
 if __name__ == "__main__":
         if len(sys.argv) == 1:
             printUsage()
-        elif len(sys.argv) == 3:
-            if sys.argv[1] == "-d":
-                only = "dict"
-                queryword = sys.argv[2]
-                sendRequest(queryword, only)
-            elif sys.argv[1] == "-t":
-                only = "tanslate"
-                queryword = sys.argv[2]
-                sendRequest(queryword, only)
-            elif sys.argv[2] == "-":
-                queryword = sys.argv[1]
-                more_ref = True
-                sendRequest(queryword, only)
-            else:
-                printUsage()
+        elif sys.argv[1] == "-d":
+            only = "dict"
+            queryword = " ".join(sys.argv[2:])
+            sendRequest(queryword, only)
+        elif sys.argv[1] == "-t":
+            only = "tanslate"
+            queryword = " ".join(sys.argv[2:])
+            sendRequest(queryword, only)
+        elif sys.argv[1] == "-v":
+            queryword = " ".join(sys.argv[2:])
+            sendRequest(queryword, None)
+            queryvoice = "%20".join(sys.argv[2:])
+            playVoice(queryvoice, False)
+        elif sys.argv[1] == "-m":
+            queryword = " ".join(sys.argv[2:])
+            more_ref = True
+            sendRequest(queryword, only)
+        elif sys.argv[1] == "-r":
+            # replay voice
+            playVoice('', True)
         else:
             queryword = " ".join(sys.argv[1:])
             sendRequest(queryword, None)
