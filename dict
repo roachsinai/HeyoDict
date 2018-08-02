@@ -32,13 +32,63 @@ only = ""
 
 core_command_quit = ".exit"
 
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
+# class bcolors:
+#     HEADER = '\033[95m'           # 粉色
+#     OKBLUE = '\033[94m'           # 蓝色
+#     OKGREEN = '\033[92m'          # 绿色
+#     WARNING = '\033[93m'          # 黄色
+#     FAIL = '\033[91m'             # 红色
+#     BOLD = '\033[1m'              # 粗体
+#     ENDC = '\033[0m'              # 结束
+
+# https://blog.csdn.net/JohinieLi/article/details/80388838
+# -----------------colorama模块的一些常量---------------------------
+# Fore: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
+# Back: BLACK, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN, WHITE, RESET.
+# Style: DIM, NORMAL, BRIGHT, RESET_ALL
+#
+
+from colorama import  init, Fore, Back # , Style
+init(autoreset=True)
+class Colored(object):
+
+    #  前景色:红色  背景色:默认
+    def red(self, s):
+        return Fore.RED + s + Fore.RESET
+
+    #  前景色:绿色  背景色:默认
+    def green(self, s):
+        return Fore.GREEN + s + Fore.RESET
+
+    #  前景色:黄色  背景色:默认
+    def yellow(self, s):
+        return Fore.YELLOW + s + Fore.RESET
+
+    #  前景色:蓝色  背景色:默认
+    def blue(self, s):
+        return Fore.BLUE + s + Fore.RESET
+
+    #  前景色:洋红色  背景色:默认
+    def magenta(self, s):
+        return Fore.MAGENTA + s + Fore.RESET
+
+    #  前景色:青色  背景色:默认
+    def cyan(self, s):
+        return Fore.CYAN + s + Fore.RESET
+
+    #  前景色:白色  背景色:默认
+    def white(self, s):
+        return Fore.WHITE + s + Fore.RESET
+
+    #  前景色:黑色  背景色:默认
+    def black(self, s):
+        return Fore.BLACK
+
+    #  前景色:白色  背景色:绿色
+    def white_green(self, s):
+        return Fore.WHITE + Back.GREEN + s + Fore.RESET + Back.RESET
+
+color = Colored() 
 
 # whether print `more ref`
 more_ref = False
@@ -74,7 +124,8 @@ def sendRequest(keyword, selection):
         try:
             content = urllib.request.urlopen(requestUrl).read()
         except:
-            print(bcolors.WARNING + "Network Error"+bcolors.ENDC)
+            # print(bcolors.WARNING + "Network Error" + bcolors.ENDC)
+            print(color.red("Network Error"))
             return -1
 
         parseContent(content)
@@ -110,29 +161,29 @@ def showResult(jsondata):
         if 'basic' not in jsondata:
             # print(' '.join(['Oops,', str(sys.argv), 'was eaten by a monster!']))
             print('Oops, a special word!')
-            print(bcolors.WARNING+ 'lɪtl bɪtʃ!' + bcolors.ENDC)
+            print(color.red('lɪtl bɪtʃ!'))
             sys.exit() # not use return, for download pronunciation
         phonetic = jsondata['basic'].get('uk-phonetic','')
         explains = jsondata['basic']['explains']
 
         #Then show word and its phonetic
-        basic_meaning = words + bcolors.HEADER + " [" + phonetic + "]" + bcolors.ENDC
+        basic_meaning = words + color.magenta(" [" + phonetic + "]")
 
         #Then show the explainations from dict
         print('======== ' + basic_meaning + ' ========')
         for ex in explains:
-                print(' ' + bcolors.OKGREEN + ex + bcolors.ENDC + ' ')
+                print(' ' + color.green(ex) + ' ')
         if more_ref:
             if 'web' not in jsondata:
                 print("\nDear Miss %s," % words)
-                print(bcolors.OKBLUE + "    There is no more thing in my pockets!" + bcolors.ENDC)
+                print(color.blue("    There is no more thing in my pockets!"))
                 return
             web_explains = jsondata['web']
             print('======== ' + 'more ref' + ' ========')
             for web in web_explains:
                 print('------ ' + web['key'] + ' ------')
                 for exp in web['value']:
-                    print(' ' + bcolors.OKBLUE + exp + bcolors.ENDC + ' ')
+                    print(' ' + color.blue(exp) + ' ')
 
 def playVoice(queryword, isReplay):
     voice_file = os.path.join(VOICE_DIR, 'pronunciation.mp3')
