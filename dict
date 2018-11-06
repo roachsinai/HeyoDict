@@ -204,28 +204,28 @@ def playVoice(queryword, isReplay):
 
 
 if __name__ == "__main__":
-        if len(sys.argv) == 1:
-            printUsage()
-        elif sys.argv[1] == "-d":
-            only = "dict"
-            queryword = " ".join(sys.argv[2:])
-            sendRequest(queryword, only)
-        elif sys.argv[1] == "-t":
-            only = "tanslate"
-            queryword = " ".join(sys.argv[2:])
-            sendRequest(queryword, only)
-        elif sys.argv[1] == "-v":
-            queryword = " ".join(sys.argv[2:])
-            sendRequest(queryword, None)
-            queryvoice = "%20".join(sys.argv[2:])
-            playVoice(queryvoice, False)
-        elif sys.argv[1] == "-m":
-            queryword = " ".join(sys.argv[2:])
-            more_ref = True
-            sendRequest(queryword, only)
-        elif sys.argv[1] == "-r":
-            # replay voice
-            playVoice('', True)
-        else:
-            queryword = " ".join(sys.argv[1:])
-            sendRequest(queryword, None)
+    if len(sys.argv) == 1:
+        printUsage()
+    elif sys.argv[1] == "-d":
+        only = "dict"
+        queryword = " ".join(sys.argv[2:])
+        sendRequest(queryword, only)
+    elif sys.argv[1] == "-t":
+        only = "tanslate"
+        queryword = " ".join(sys.argv[2:])
+        sendRequest(queryword, only)
+    elif sys.argv[1] == "-v":
+        queryword = " ".join(sys.argv[2:])
+        sendRequest(queryword, None)
+        queryvoice = "%20".join(sys.argv[2:])
+        playVoice(queryvoice, False)
+    elif sys.argv[1] == "-m":
+        queryword = " ".join(sys.argv[2:])
+        more_ref = True
+        sendRequest(queryword, only)
+    elif sys.argv[1] == "-r":
+        # replay voice
+        playVoice('', True)
+    else:
+        queryword = " ".join(sys.argv[1:])
+        sendRequest(queryword, None)
