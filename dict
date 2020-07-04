@@ -21,8 +21,8 @@ VOICE_DIR = os.path.join(BASE_DIR, 'voice')     # 音频文件
 
 # Key and name
 url = "http://fanyi.youdao.com/openapi.do?%s"
-keyFrom = "SunnyArtStudio"
-key = "1884243682"
+keyFrom = "{{@@ env['youdao_fanyi_keyFrom'] @@}}"
+key = "{{@@ env['youdao_fanyi_key'] @@}}"
 dataType = "data"
 docType = "json"
 version = "1.1"
@@ -216,9 +216,12 @@ if __name__ == "__main__":
         sendRequest(queryword, only)
     elif sys.argv[1] == "-v":
         queryword = " ".join(sys.argv[2:])
-        sendRequest(queryword, None)
-        queryvoice = "%20".join(sys.argv[2:])
-        playVoice(queryvoice, False)
+        if queryword != "":
+            sendRequest(queryword, None)
+            queryvoice = "%20".join(sys.argv[2:])
+            playVoice(queryvoice, False)
+        else:
+            playVoice("", True)
     elif sys.argv[1] == "-m":
         queryword = " ".join(sys.argv[2:])
         more_ref = True
